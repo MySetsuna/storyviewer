@@ -1,12 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { observer, useLocalStore } from "mobx-react";
+import { observer, useLocalObservable, useLocalStore } from "mobx-react";
 import "./styles.less";
 import Rows from "./components/Rows";
-import { set } from "lodash";
 import TableStore from "./state";
 
 const Table = observer(() => {
-  const store = useLocalStore(() => new TableStore());
+  const [store] = useState(new TableStore());
   const tableRef = useRef();
   const rowsRef = useRef();
   const [scrollBlock, setScrollBlock] = useState(0);

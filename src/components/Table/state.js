@@ -13,9 +13,14 @@ class TableStore {
   setPerHeight(val) {
     this.perHeight = val;
   }
-  isUp = false;
-  setIsUp(val) {
-    this.isUp = val;
+  // isUp = false;
+  // setIsUp(val) {
+  //   this.isUp = val;
+  // }
+  totalScrollTop;
+  setTotalScrollTop(val) {
+    console.log(val);
+    this.totalScrollTop = val;
   }
 }
 

@@ -60,25 +60,36 @@ const Rows = observer((props) => {
       clientWidth,
       scrollHeight,
     } = rowsRef.current;
-
-    const { perHeight, isUp } = store;
+    // store.setPreScrollTop(scrollTop);
+    const { perHeight } = store;
+    const isUp =
+      (store.currentIndex - 1) * perHeight + scrollTop < store.totalScrollTop;
     console.log(
-      offsetHeight,
-      perHeight,
-      rowsRef.current.scrollTop,
-      perHeight * 2,
-      store.currentIndex
+      // rowsRef.current.scrollTop,
+      // perHeight * 1.25,
+      store.currentIndex,
+      (store.currentIndex - 1) * perHeight + scrollTop,
+      store.totalScrollTop,
+      isUp
     );
+    let currentScrollTop = rowsRef.current.scrollTop;
+    let currentIndex = store.currentIndex;
     if (!isUp && scrollTop >= perHeight * 1.25) {
       console.log(store.currentIndex, "store.currentIndex");
-      store.setCurrentIndex(store.currentIndex + 1);
-      rowsRef.current.scrollTop -= perHeight;
+      currentIndex = store.currentIndex + 1;
+      currentScrollTop = rowsRef.current.scrollTop - perHeight;
+      store.setCurrentIndex(currentIndex);
+      rowsRef.current.scrollTop = currentScrollTop;
     } else if (isUp && scrollTop <= perHeight / 2) {
       if (store.currentIndex > 1) {
-        store.setCurrentIndex(store.currentIndex - 1);
-        e.target.scrollTop += perHeight;
+        currentIndex = store.currentIndex - 1;
+        currentScrollTop = rowsRef.current.scrollTop + perHeight;
+        store.setCurrentIndex(currentIndex);
+        console.log(store.currentIndex, "store.currentIndex");
+        rowsRef.current.scrollTop = currentScrollTop;
       }
     }
+    store.setTotalScrollTop((currentIndex - 1) * perHeight + currentScrollTop);
   });
 
   const setScrollTop = useCallback((value) => {
@@ -121,10 +132,6 @@ const Rows = observer((props) => {
 
   return (
     <div
-      onWheel={(e) => {
-        const isUp = e.deltaY < 0;
-        store.setIsUp(isUp);
-      }}
       ref={rowsRef}
       className={styles.rows}
       style={{
