@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import "./App.css";
 import md5 from "md5";
-import Table from "./components/Table";
+import VirtualTable from "./components/Table/VirtualTable";
 
 const ThemeContext = React.createContext();
 const UserContext = React.createContext();
@@ -32,7 +32,7 @@ function App() {
       <UserContext.Provider value={useInfo}>
         <ThemeContext.Provider value={themeInfo}>
           <div>
-            <Table />
+            <VirtualTable />
           </div>
           {/* <div>
             <ThemeContext.Consumer>{value => <div>主题：{JSON.stringify(value)}</div>}</ThemeContext.Consumer>

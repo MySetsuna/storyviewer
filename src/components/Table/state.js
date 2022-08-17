@@ -9,6 +9,10 @@ class TableStore {
   setCurrentIndex(val) {
     this.currentIndex = val;
   }
+  preIndex = 1;
+  setPreIndex(val) {
+    this.preIndex = val;
+  }
   perHeight = 0;
   setPerHeight(val) {
     this.perHeight = val;
@@ -17,9 +21,8 @@ class TableStore {
   // setIsUp(val) {
   //   this.isUp = val;
   // }
-  totalScrollTop;
+  totalScrollTop = 0;
   setTotalScrollTop(val) {
-    console.log(val);
     this.totalScrollTop = val;
   }
 }

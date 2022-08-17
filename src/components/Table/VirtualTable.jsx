@@ -4,7 +4,7 @@ import "./styles.less";
 import Rows from "./components/Rows";
 import TableStore from "./state";
 
-const Table = observer(() => {
+const VirtualTable = observer(() => {
   const [store] = useState(new TableStore());
   const tableRef = useRef();
   const rowsRef = useRef();
@@ -12,7 +12,7 @@ const Table = observer(() => {
   const cellValues = new Array(100)
     .fill("category")
     .map((category, index) => `${category}__${index}`.toUpperCase());
-  const data = new Array(1000).fill(null).map((_, index) => {
+  const data = new Array(10000).fill(null).map((_, index) => {
     const row = {};
     cellValues.forEach((key) => {
       row[key] = index;
@@ -76,4 +76,4 @@ const Table = observer(() => {
     </div>
   );
 });
-export default Table;
+export default VirtualTable;
