@@ -9,7 +9,7 @@ import TableStore from "../../state";
  * @t
  */
 const Rows = observer((props) => {
-  const { cellValues, rows, tableRef, rowsRef, store } = props;
+  const { cellValues, rows, tableRef, rowsRef, store, scrollBlock } = props;
   const [blocks, setBlocks] = useState([]);
   const [curentBolckIndex, setCurrentBoclkIndex] = useState(1);
   const [moveHeight, setMoveHeight] = useState(0);
@@ -29,10 +29,17 @@ const Rows = observer((props) => {
         // clientHeight,
         scrollHeight,
       } = e.target;
+      console.log(rowsRef?.current?.scrollTop);
       let currentIndex = Math.floor(scrollTop / store.perHeight);
       let rowsBoxScrollTop =
         scrollTop - (store.currentIndex - 1) * store.perHeight;
       rowsRef.current.scrollTop = rowsBoxScrollTop;
+      if (
+        rowsBoxScrollTop >
+        rowsRef.current.scrollHeight - store.perHeight + scrollBlock
+      ) {
+        store.setCurrentIndex(Math.max(currentIndex, 1));
+      }
     }
   });
 
@@ -62,13 +69,15 @@ const Rows = observer((props) => {
       Math.abs(store.totalScrollTop - tableRef.current.scrollTop) > perHeight
     ) {
       store.setTotalScrollTop(tableRef.current.scrollTop);
+
       let currentIndex = Math.floor(
         tableRef.current.scrollTop / store.perHeight
       );
       let rowsBoxScrollTop =
         tableRef.current.scrollTop - (currentIndex - 1) * store.perHeight;
-      store.setCurrentIndex(currentIndex);
+      store.setCurrentIndex(Math.max(currentIndex, 1));
       rowsRef.current.scrollTop = rowsBoxScrollTop;
+      store.setCurrentTop(rowsRef?.current?.scrollTop);
       return;
     }
     const isUp =
@@ -94,8 +103,9 @@ const Rows = observer((props) => {
       }
     }
     const totalScrollTop = (currentIndex - 1) * perHeight + currentScrollTop;
-    store.setTotalScrollTop(totalScrollTop + (isUp ? 1 : -1));
 
+    store.setTotalScrollTop(totalScrollTop + (isUp ? 1 : -1));
+    store.setCurrentTop(rowsRef?.current?.scrollTop);
     tableRef.current.scrollTop = totalScrollTop;
   });
 
@@ -151,7 +161,7 @@ const Rows = observer((props) => {
         style={{
           // position: "absolute",
           height: offsetHeight - (offsetHeight % 32),
-          top: -moveHeight - offsetHeight,
+          // top: -moveHeight - offsetHeight,
           pointerEvents: "auto",
         }}
       >
@@ -172,7 +182,10 @@ const Rows = observer((props) => {
         className="currentRows"
         style={{
           // position: "absolute",
-          // height: offsetHeight - (offsetHeight % 32),
+          height:
+            blocks.length - 1 === store.currentIndex
+              ? "max-content"
+              : offsetHeight - (offsetHeight % 32),
           // height: blocks[curentBolckIndex] * 32,
           top: -moveHeight,
           pointerEvents: "auto",
@@ -197,25 +210,29 @@ const Rows = observer((props) => {
         style={{
           // position: "absolute",
           // top: -moveHeight + offsetHeight,
-          height: "max-content",
+          height:
+            store.currentTop > store.perHeight * 0.75
+              ? "max-content"
+              : offsetHeight - (offsetHeight % 32),
           pointerEvents: "auto",
           // height: 32 * blocks[curentBolckIndex + 1]?.length,
           // height: offsetHeight - (offsetHeight % 32),
           // overflow: "hidden",
         }}
       >
-        {blocks[store.currentIndex + 1]?.map((value, index) => (
-          <div
-            key={index}
-            style={{
-              height: 32,
-              borderBottom: "solid 1px red",
-              boxSizing: "border-box",
-            }}
-          >
-            {value[cellValues[0]]}
-          </div>
-        ))}
+        {store.currentTop > store.perHeight * 0.75 &&
+          blocks[store.currentIndex + 1]?.map((value, index) => (
+            <div
+              key={index}
+              style={{
+                height: 32,
+                borderBottom: "solid 1px red",
+                boxSizing: "border-box",
+              }}
+            >
+              {value[cellValues[0]]}
+            </div>
+          ))}
       </div>
     </div>
   );

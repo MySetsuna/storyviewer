@@ -12,7 +12,7 @@ const VirtualTable = observer(() => {
   const cellValues = new Array(100)
     .fill("category")
     .map((category, index) => `${category}__${index}`.toUpperCase());
-  const data = new Array(10000).fill(null).map((_, index) => {
+  const data = new Array(100000).fill(null).map((_, index) => {
     const row = {};
     cellValues.forEach((key) => {
       row[key] = index;
@@ -29,6 +29,7 @@ const VirtualTable = observer(() => {
 
   return (
     <div className="table">
+      <div style={{ position: "fixed", top: 0 }}></div>
       <div
         onWheel={(e) => {
           // const move = e.deltaY / Math.abs(e.deltaY);

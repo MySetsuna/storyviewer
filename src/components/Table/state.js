@@ -17,10 +17,10 @@ class TableStore {
   setPerHeight(val) {
     this.perHeight = val;
   }
-  // isUp = false;
-  // setIsUp(val) {
-  //   this.isUp = val;
-  // }
+  currentTop = 0;
+  setCurrentTop(val) {
+    this.currentTop = val;
+  }
   totalScrollTop = 0;
   setTotalScrollTop(val) {
     this.totalScrollTop = val;
