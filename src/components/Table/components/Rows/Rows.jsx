@@ -9,7 +9,7 @@ import TableStore from "../../state";
  * @t
  */
 const Rows = observer((props) => {
-  const { cellValues, rows, tableRef, rowsRef, store, scrollBlock } = props;
+  const { fields, rows, tableRef, rowsRef, store, scrollBlock } = props;
   const [blocks, setBlocks] = useState([]);
   const [curentBolckIndex, setCurrentBoclkIndex] = useState(1);
   const [moveHeight, setMoveHeight] = useState(0);
@@ -36,7 +36,7 @@ const Rows = observer((props) => {
       rowsRef.current.scrollTop = rowsBoxScrollTop;
       if (
         rowsBoxScrollTop >
-        rowsRef.current.scrollHeight - store.perHeight + scrollBlock
+        rowsRef.current.scrollHeight - store.perHeight + scrollBlock.boxSizing
       ) {
         store.setCurrentIndex(Math.max(currentIndex, 1));
       }
@@ -127,7 +127,7 @@ const Rows = observer((props) => {
       };
     }
     return () => {
-      tableRef.current.removeEventListener("scroll", listener);
+      tableRef.current?.removeEventListener("scroll", listener);
     };
   }, [tableRef.current, rows]);
 
@@ -136,7 +136,7 @@ const Rows = observer((props) => {
       rowsRef.current.addEventListener("scroll", sycListener);
     }
     return () => {
-      tableRef.current.removeEventListener("scroll", sycListener);
+      rowsRef.current?.removeEventListener("scroll", sycListener);
     };
   }, [rowsRef.current, rows]);
 
@@ -174,7 +174,7 @@ const Rows = observer((props) => {
               boxSizing: "border-box",
             }}
           >
-            {value[cellValues[0]]}
+            {value[fields?.[0]]}
           </div>
         ))}
       </div>
@@ -182,10 +182,7 @@ const Rows = observer((props) => {
         className="currentRows"
         style={{
           // position: "absolute",
-          height:
-            blocks.length - 1 === store.currentIndex
-              ? "max-content"
-              : offsetHeight - (offsetHeight % 32),
+          height: "max-content",
           // height: blocks[curentBolckIndex] * 32,
           top: -moveHeight,
           pointerEvents: "auto",
@@ -200,7 +197,7 @@ const Rows = observer((props) => {
               boxSizing: "border-box",
             }}
           >
-            {value[cellValues[0]]}
+            {value[fields[0]]}
           </div>
         ))}
       </div>
@@ -211,7 +208,7 @@ const Rows = observer((props) => {
           // position: "absolute",
           // top: -moveHeight + offsetHeight,
           height:
-            store.currentTop > store.perHeight * 0.75
+            store.currentTop > store.perHeight * 0.75 || isEmpty(blocks[store.currentIndex + 1])
               ? "max-content"
               : offsetHeight - (offsetHeight % 32),
           pointerEvents: "auto",
@@ -230,7 +227,7 @@ const Rows = observer((props) => {
                 boxSizing: "border-box",
               }}
             >
-              {value[cellValues[0]]}
+              {value[fields[0]]}
             </div>
           ))}
       </div>
