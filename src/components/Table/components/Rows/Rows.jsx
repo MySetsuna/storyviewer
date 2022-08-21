@@ -16,129 +16,107 @@ const Rows = observer((props) => {
   const [offsetHeight, setOffsetHeight] = useState(0);
   const [clientHeight, setClientHeight] = useState(0);
 
-  const listener = useCallback((e) => {
-    if (!isEmpty(blocks)) {
-      const {
-        scrollTop,
-        scrollLeft,
-        offsetHeight,
-        offsetLeft,
-        offsetWidth,
-        offsetTop,
-        offsetParent,
-        // clientHeight,
-        scrollHeight,
-      } = e.target;
-      console.log(rowsRef?.current?.scrollTop);
-      let currentIndex = Math.floor(scrollTop / store.perHeight);
-      let rowsBoxScrollTop =
-        scrollTop - (store.currentIndex - 1) * store.perHeight;
-      rowsRef.current.scrollTop = rowsBoxScrollTop;
-      if (
-        rowsBoxScrollTop >
-        rowsRef.current.scrollHeight - store.perHeight + scrollBlock.boxSizing
-      ) {
-        store.setCurrentIndex(Math.max(currentIndex, 1));
-      }
-    }
-  });
-
-  const removeTableRefEventListener = useCallback(
+  const initSign = useCallback(
     debounce(() => {
-      tableRef.current.addEventListener("scroll", listener);
+      store.setSign("first");
     }, 100)
   );
 
-  const sycListener = useCallback((e) => {
-    // tableRef.current.removeEventListener("scroll", listener);
-    const {
-      scrollTop,
-      scrollLeft,
-      offsetHeight,
-      offsetLeft,
-      offsetWidth,
-      offsetTop,
-      offsetParent,
-      clientHeight,
-      clientWidth,
-      scrollHeight,
-    } = rowsRef.current;
-    // store.setPreScrollTop(scrollTop);
-    const { perHeight, preIndex } = store;
+  const rowsBoxScroll = useCallback((e) => {
+    if (store.sign !== e.target.className && store.sign !== "first") return;
+    store.setSign(rowsRef.current.className);
+    const { scrollTop: top, scrollLeft: left } = rowsRef.current;
+    let { currentTop: preTop, preIndex, currentIndex, perHeight } = store;
+    const isUp = preTop > top || preIndex > currentIndex;
+    let currentScrollTop = top;
+    store.setPreIndex(currentIndex);
     if (
-      Math.abs(store.totalScrollTop - tableRef.current.scrollTop) > perHeight
+      !isUp &&
+      top > perHeight * 1.25 &&
+      store.currentIndex < blocks.length - 2
     ) {
-      store.setTotalScrollTop(tableRef.current.scrollTop);
-
-      let currentIndex = Math.floor(
-        tableRef.current.scrollTop / store.perHeight
-      );
-      let rowsBoxScrollTop =
-        tableRef.current.scrollTop - (currentIndex - 1) * store.perHeight;
-      store.setCurrentIndex(Math.max(currentIndex, 1));
-      rowsRef.current.scrollTop = rowsBoxScrollTop;
-      store.setCurrentTop(rowsRef?.current?.scrollTop);
-      return;
-    }
-    const isUp =
-      preIndex > store.curentBolckIndex ||
-      (store.currentIndex - 1) * perHeight + e.target.scrollTop <
-        store.totalScrollTop;
-
-    let currentScrollTop = rowsRef.current.scrollTop;
-    let currentIndex = store.currentIndex;
-    if (!isUp && scrollTop >= perHeight * 1.25) {
-      currentIndex = store.currentIndex + 1;
-      currentScrollTop = rowsRef.current.scrollTop - perHeight;
-      store.setPreIndex(store.currentIndex);
+      currentIndex += 1;
+      currentScrollTop = top - perHeight;
       store.setCurrentIndex(currentIndex);
-      rowsRef.current.scrollTop = currentScrollTop;
-    } else if (isUp && scrollTop <= perHeight / 2) {
-      if (store.currentIndex > 1) {
-        currentIndex = store.currentIndex - 1;
-        currentScrollTop = rowsRef.current.scrollTop + perHeight;
-        store.setPreIndex(store.currentIndex);
-        store.setCurrentIndex(currentIndex);
-        rowsRef.current.scrollTop = currentScrollTop;
-      }
-    }
-    const totalScrollTop = (currentIndex - 1) * perHeight + currentScrollTop;
+      store.setCurrentTop(currentScrollTop - 2);
+      rowsRef.current.scrollTo(left, currentScrollTop);
+    } else if (
+      isUp &&
+      store.currentIndex > 1 &&
+      top < perHeight / 2 &&
+      store.currentIndex < blocks.length - 1
+    ) {
+      currentScrollTop = top + perHeight;
+      currentIndex -= 1;
 
-    store.setTotalScrollTop(totalScrollTop + (isUp ? 1 : -1));
-    store.setCurrentTop(rowsRef?.current?.scrollTop);
-    tableRef.current.scrollTop = totalScrollTop;
+      store.setCurrentIndex(currentIndex);
+      store.setCurrentTop(currentScrollTop + 2);
+      rowsRef.current.scrollTo(left, currentScrollTop);
+    } else if (preIndex === currentIndex) {
+      // setTimeout(() => {
+      store.setCurrentTop(currentScrollTop + (isUp ? 1 : -1));
+      // });
+    }
+    tableRef.current.scrollTo(
+      left,
+      (currentIndex - 1) * perHeight + currentScrollTop
+    );
+    store.setMiddleClickScroll(false);
+    initSign();
   });
 
-  const setScrollTop = useCallback((value) => {
-    tableRef.current.scrollTop = value;
+  const tableBoxScroll = useCallback((e) => {
+    if (store.sign !== tableRef.current.className && store.sign !== "first")
+      return;
+    store.setSign(tableRef.current.className);
+    const { scrollTop: top, scrollLeft: left } = tableRef.current;
+    let currentIndex = Math.floor((top + store.perHeight) / store.perHeight);
+    let rowsBoxScrollTop;
+    if (currentIndex < blocks.length - 1) {
+      store.setCurrentIndex(currentIndex);
+      rowsBoxScrollTop = top - (currentIndex - 1) * store.perHeight;
+    } else {
+      store.setCurrentIndex(currentIndex - 1);
+      rowsBoxScrollTop = top - (currentIndex - 2) * store.perHeight + 2;
+    }
+    store.setCurrentTop(rowsBoxScrollTop);
+    rowsRef.current.scrollTo({ left, top: rowsBoxScrollTop });
+    store.setMiddleClickScroll(false);
+    initSign();
+  });
+
+  const addScrollEvent = useCallback((node, eventFn) => {
+    if (!eventFn) return;
+
+    // node.addEventListener("mouseenter", async (e) => {
+    //   console.log(
+    //     store.isMiddleClickScroll,
+    //     "store.isMiddleClickScroll",
+    //     "444"
+    //   );
+    //   // if (!store.isMiddleClickScroll) {
+    //   // console.log(store.isMiddleClickScroll, "store.isMiddleClickScroll");
+    //   await store.setSign(node.className);
+    //   // }
+    // }); // 这里不同的节点用不同的 class 值
+    let event = eventFn.bind(node);
+    node.addEventListener("scroll", event);
   });
 
   useEffect(() => {
-    if (tableRef.current) {
+    if (tableRef.current && rowsRef.current && rows) {
       const blocks = chunk(rows, tableRef.current.offsetHeight / 32);
       const perHeight = 32 * blocks[0]?.length;
       setBlocks(blocks);
       store.setPerHeight(perHeight);
       setClientHeight(tableRef.current.clientHeight);
       setOffsetHeight(tableRef.current.offsetHeight);
-      tableRef.current.addEventListener("scroll", listener);
-      window.setScrollTop = (value) => {
-        tableRef.current.scrollTop = value;
-      };
+      // syncScroller(tableRef.current, rowsRef.current);
+      const { sign } = store;
+      addScrollEvent(rowsRef.current, rowsBoxScroll);
+      addScrollEvent(tableRef.current, tableBoxScroll);
     }
-    return () => {
-      tableRef.current?.removeEventListener("scroll", listener);
-    };
-  }, [tableRef.current, rows]);
-
-  useEffect(() => {
-    if (rowsRef.current) {
-      rowsRef.current.addEventListener("scroll", sycListener);
-    }
-    return () => {
-      rowsRef.current?.removeEventListener("scroll", sycListener);
-    };
-  }, [rowsRef.current, rows]);
+  }, [tableRef.current, rowsRef.current, rows]);
 
   return (
     <div
@@ -160,7 +138,7 @@ const Rows = observer((props) => {
         className="preBufferRows"
         style={{
           // position: "absolute",
-          height: offsetHeight - (offsetHeight % 32),
+          height: store.perHeight,
           // top: -moveHeight - offsetHeight,
           pointerEvents: "auto",
         }}
@@ -182,7 +160,10 @@ const Rows = observer((props) => {
         className="currentRows"
         style={{
           // position: "absolute",
-          height: "max-content",
+          height:
+            store.currentIndex === blocks.length - 1
+              ? "max-content"
+              : store.perHeight,
           // height: blocks[curentBolckIndex] * 32,
           top: -moveHeight,
           pointerEvents: "auto",
@@ -208,7 +189,8 @@ const Rows = observer((props) => {
           // position: "absolute",
           // top: -moveHeight + offsetHeight,
           height:
-            store.currentTop > store.perHeight * 0.75 || isEmpty(blocks[store.currentIndex + 1])
+            store.currentTop > store.perHeight * 0.75 ||
+            isEmpty(blocks[store.currentIndex + 1])
               ? "max-content"
               : offsetHeight - (offsetHeight % 32),
           pointerEvents: "auto",

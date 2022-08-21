@@ -21,9 +21,21 @@ class TableStore {
   setCurrentTop(val) {
     this.currentTop = val;
   }
+  isUp = undefined;
+  setIsUp(val) {
+    this.isUp = val;
+  }
   totalScrollTop = 0;
   setTotalScrollTop(val) {
     this.totalScrollTop = val;
+  }
+  sign = "first";
+  setSign(val) {
+    this.sign = val;
+  }
+  isMiddleClickScroll = false;
+  setMiddleClickScroll(val) {
+    this.isMiddleClickScroll = val;
   }
 }
 
