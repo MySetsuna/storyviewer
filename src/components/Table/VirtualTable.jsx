@@ -23,7 +23,7 @@ const VirtualTable = observer((props) => {
   const fields = new Array(100)
     .fill("category")
     .map((category, index) => `${category}__${index}`.toUpperCase());
-  const data = new Array(100000).fill(null).map((_, index) => {
+  const data = new Array(1000).fill(null).map((_, index) => {
     const row = {};
     fields.forEach((key) => {
       row[key] = index;

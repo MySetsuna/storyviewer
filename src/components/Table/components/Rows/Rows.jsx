@@ -75,7 +75,7 @@ const Rows = observer((props) => {
     let rowsBoxScrollTop;
     if (currentIndex < blocks.length - 1) {
       store.setCurrentIndex(currentIndex);
-      rowsBoxScrollTop = top - (currentIndex - 1) * store.perHeight;
+      rowsBoxScrollTop = top - (currentIndex - 1) * store.perHeight + 1;
     } else {
       store.setCurrentIndex(currentIndex - 1);
       rowsBoxScrollTop = top - (currentIndex - 2) * store.perHeight + 2;
