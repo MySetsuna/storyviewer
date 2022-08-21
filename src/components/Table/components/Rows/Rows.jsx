@@ -9,7 +9,8 @@ import TableStore from "../../state";
  * @t
  */
 const Rows = observer((props) => {
-  const { fields, rows, tableRef, rowsRef, store, scrollBlock } = props;
+  const { fields, rows, tableRef, rowsRef, store, scrollBlock, rowHeight } =
+    props;
   const [blocks, setBlocks] = useState([]);
   const [curentBolckIndex, setCurrentBoclkIndex] = useState(1);
   const [moveHeight, setMoveHeight] = useState(0);
@@ -105,8 +106,8 @@ const Rows = observer((props) => {
 
   useEffect(() => {
     if (tableRef.current && rowsRef.current && rows) {
-      const blocks = chunk(rows, tableRef.current.offsetHeight / 32);
-      const perHeight = 32 * blocks[0]?.length;
+      const blocks = chunk(rows, tableRef.current.offsetHeight / rowHeight);
+      const perHeight = rowHeight * blocks[0]?.length;
       setBlocks(blocks);
       store.setPerHeight(perHeight);
       setClientHeight(tableRef.current.clientHeight);
@@ -131,7 +132,7 @@ const Rows = observer((props) => {
         position: "relative",
         // overflow: "scroll",
         scrollbarWidth: 1,
-        // top: !curentBolckIndex ? -offsetHeight + (offsetHeight % 32) : 0,
+        // top: !curentBolckIndex ? -offsetHeight + (offsetHeight % rowHeight) : 0,
       }}
     >
       <div
@@ -147,7 +148,7 @@ const Rows = observer((props) => {
           <div
             key={index}
             style={{
-              height: 32,
+              height: rowHeight,
               borderBottom: "solid 1px red",
               boxSizing: "border-box",
             }}
@@ -164,7 +165,7 @@ const Rows = observer((props) => {
             store.currentIndex === blocks.length - 1
               ? "max-content"
               : store.perHeight,
-          // height: blocks[curentBolckIndex] * 32,
+          // height: blocks[curentBolckIndex] * rowHeight,
           top: -moveHeight,
           pointerEvents: "auto",
         }}
@@ -173,7 +174,7 @@ const Rows = observer((props) => {
           <div
             key={index}
             style={{
-              height: 32,
+              height: rowHeight,
               borderBottom: "solid 1px red",
               boxSizing: "border-box",
             }}
@@ -192,10 +193,10 @@ const Rows = observer((props) => {
             store.currentTop > store.perHeight * 0.75 ||
             isEmpty(blocks[store.currentIndex + 1])
               ? "max-content"
-              : offsetHeight - (offsetHeight % 32),
+              : offsetHeight - (offsetHeight % rowHeight),
           pointerEvents: "auto",
-          // height: 32 * blocks[curentBolckIndex + 1]?.length,
-          // height: offsetHeight - (offsetHeight % 32),
+          // height: rowHeight * blocks[curentBolckIndex + 1]?.length,
+          // height: offsetHeight - (offsetHeight % rowHeight),
           // overflow: "hidden",
         }}
       >
@@ -204,7 +205,7 @@ const Rows = observer((props) => {
             <div
               key={index}
               style={{
-                height: 32,
+                height: rowHeight,
                 borderBottom: "solid 1px red",
                 boxSizing: "border-box",
               }}

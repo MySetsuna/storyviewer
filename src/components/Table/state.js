@@ -4,7 +4,7 @@ class TableStore {
   constructor() {
     makeAutoObservable(this);
   }
-
+  rowHeight = 32;
   currentIndex = 1;
   setCurrentIndex(val) {
     this.currentIndex = val;

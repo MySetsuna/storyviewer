@@ -16,13 +16,14 @@ import TableStore from "./state";
  */
 const VirtualTable = observer((props) => {
   const [store] = useState(new TableStore());
+  const { rowHeight } = store;
   const tableRef = useRef();
   const rowsRef = useRef();
   const [scrollBlock, setScrollBlock] = useState({ x: 0, y: 0 });
   const fields = new Array(100)
     .fill("category")
     .map((category, index) => `${category}__${index}`.toUpperCase());
-  const data = new Array(1000).fill(null).map((_, index) => {
+  const data = new Array(1000000).fill(null).map((_, index) => {
     const row = {};
     fields.forEach((key) => {
       row[key] = index;
@@ -55,9 +56,10 @@ const VirtualTable = observer((props) => {
           tableRef={tableRef}
           rowsRef={rowsRef}
           scrollBlock={scrollBlock}
+          rowHeight={rowHeight}
         />
       </div>
-      
+
       <div
         className="table-box"
         ref={tableRef}
@@ -71,7 +73,7 @@ const VirtualTable = observer((props) => {
       >
         <div
           style={{
-            height: data.length * 32,
+            height: data.length * rowHeight,
             width: 150 * fields.length,
             zIndex: -1,
             pointerEvents: "none",
