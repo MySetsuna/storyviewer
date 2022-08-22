@@ -1,0 +1,17 @@
+.table {
+    height: 100%;
+    width: 100%;
+    position: relative;
+    :global {
+        .context-box {
+            position: absolute;
+            z-index: 3;
+            color: black;
+            // pointer-events: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+    }
+}
