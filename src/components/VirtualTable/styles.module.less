@@ -1,10 +1,11 @@
 .table {
-    height: 100%;
-    width: 100%;
-    position: relative;
+    display: flex;
+    flex-direction: column;
     :global {
         .context-box {
-            position: absolute;
+            position: sticky;
+            top: 0;
+            left: 0;
             z-index: 3;
             color: black;
             // pointer-events: none;
@@ -13,5 +14,101 @@
             align-items: center;
             overflow: hidden;
         }
+        .body-grid {
+            background-color: inherit;
+            z-index: 1;
+            .ReactVirtualized__Grid__innerScrollContainer {
+                overflow: unset !important;
+            }
+        }
+        .loading {
+            position: sticky !important;
+            left: 0px !important;
+            top: unset !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    }
+}
+
+.headerGrid {
+    // overflow-y: unset !important;
+    overflow: hidden !important;
+    z-index: 2;
+    border-bottom: solid 1px #2e2e30;
+    :global {
+        .ReactVirtualized__Grid__innerScrollContainer {
+            overflow: unset !important;
+        }
+    }
+}
+.scrollable {
+    overflow: unset !important;
+    z-index: 2;
+    border-bottom: solid 1px #2e2e30;
+    :global {
+        .ReactVirtualized__Grid__innerScrollContainer {
+            overflow: unset !important;
+        }
+    }
+}
+
+.skeleton {
+    position: absolute;
+    z-index: 0;
+}
+
+.rowClassName {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.headerClassName {
+    position: relative;
+}
+
+.Cell {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    border-bottom: 1px solid #eee;
+    box-sizing: border-box;
+    position: sticky !important;
+    position: -webkit-sticky !important;
+    z-index: 2;
+}
+
+.stickyRow {
+    display: flex;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+.stickyCell {
+    position: sticky;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    color: white;
+    transition: all 0.01s;
+    transform: translateZ(0);
+    :global {
+        .virtual-td {
+            display: flex;
+        }
+        // .string-title {
+        //     padding: 0 10px;
+        // }
+    }
+}
+
+.hoverClassName {
+    &:hover {
+        background-color: #17171a !important;
     }
 }

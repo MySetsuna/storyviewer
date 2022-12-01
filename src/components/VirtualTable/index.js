@@ -1,3 +1,2 @@
-import Table from "./Table";
-
-export default Table;
+import VirtualTable from './VirtualTable';
+export { VirtualTable };
